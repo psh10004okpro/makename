@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  namingRequests NamingRequest[]
+
+  @@map("users")
+}
+
+model NamingRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "baby", "rename", "company"
+  input     Json     // 입력 데이터 (생년월일, 성씨 등)
+  status    String   @default("pending") // "pending", "processing", "completed", "failed"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  result NamingResult?
+
+  @@map("naming_requests")
+}
+
+model NamingResult {
+  id          String   @id @default(cuid())
+  requestId   String   @unique
+  suggestions Json     // 추천 이름 목록
+  analysis    Json     // 사주팔자 분석 결과
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  request NamingRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("naming_results")
+}
