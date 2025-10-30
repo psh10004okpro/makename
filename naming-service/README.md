@@ -99,6 +99,13 @@ ANTHROPIC_API_KEY="your-api-key-here"
 # 의존성 설치
 npm install
 
+# 환경 변수 설정
+cp .env.example .env
+# .env 파일을 열어 DATABASE_URL 등을 설정하세요
+
+# PostgreSQL 데이터베이스 준비 후 마이그레이션 실행
+npm run prisma:migrate
+
 # Prisma 클라이언트 생성
 npm run prisma:generate
 
@@ -110,16 +117,43 @@ npm run build
 npm start
 ```
 
+### 데이터베이스 설정
+
+1. **PostgreSQL 설치 및 실행**
+   ```bash
+   # Docker를 사용하는 경우
+   docker run --name naming-postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
+   ```
+
+2. **데이터베이스 생성**
+   ```bash
+   # PostgreSQL에 접속하여 데이터베이스 생성
+   createdb naming_service
+   ```
+
+3. **.env 파일 설정**
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/naming_service?schema=public"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret-key-here"
+   ANTHROPIC_API_KEY="your-api-key-here"
+   ```
+
+4. **마이그레이션 실행**
+   ```bash
+   npm run prisma:migrate
+   ```
+
 ### Prisma 명령어
 
 ```bash
 # Prisma 클라이언트 생성
 npm run prisma:generate
 
-# 데이터베이스 마이그레이션
+# 데이터베이스 마이그레이션 생성 및 적용
 npm run prisma:migrate
 
-# Prisma Studio 실행
+# Prisma Studio 실행 (데이터베이스 GUI)
 npm run prisma:studio
 ```
 
@@ -151,33 +185,102 @@ npm run prisma:studio
 - [x] Prisma 스키마 작성
 - [x] 기본 UI 컴포넌트
 
-### Phase 2: 사주팔자 로직
+### Phase 2: 데이터베이스 및 인증 구현 ✅
+- [x] Prisma 스키마 완성 (User, NamingRequest, NamingResult 모델)
+- [x] Enum 타입 정의 (NamingType, Gender, NamingMethod, RequestStatus)
+- [x] NextAuth.js v5 설정 (Credentials Provider)
+- [x] bcrypt로 비밀번호 해싱
+- [x] 로그인/회원가입 페이지 구현
+- [x] React Hook Form + Zod 폼 유효성 검증
+- [x] 인증 미들웨어 설정 (보호된 라우트)
+- [x] Server Actions 구현
+
+### Phase 3: 사주팔자 로직
 - [ ] 생년월일시 → 사주팔자 변환
 - [ ] 오행 분석
 - [ ] 용신 추출
 
-### Phase 3: 한자 분석
+### Phase 4: 한자 분석
 - [ ] 한자 데이터베이스 구축
 - [ ] 획수 계산
 - [ ] 음양오행 분류
 - [ ] 의미 분석
 
-### Phase 4: LLM 통합
+### Phase 5: LLM 통합
 - [ ] Claude API 연동
 - [ ] 이름 생성 프롬프트
 - [ ] 결과 파싱 및 검증
 
-### Phase 5: UI/UX
+### Phase 6: UI/UX
 - [ ] 입력 폼 구현
 - [ ] 결과 페이지 디자인
 - [ ] 반응형 디자인
 - [ ] 애니메이션
 
-### Phase 6: 인증 및 배포
-- [ ] NextAuth 설정
-- [ ] 사용자 관리
+### Phase 7: 배포
 - [ ] 결제 시스템
 - [ ] 프로덕션 배포
+
+## 인증 시스템
+
+### 로그인/회원가입
+- **로그인**: `/login` - 이메일/비밀번호 인증
+- **회원가입**: `/signup` - 이메일, 이름, 비밀번호 (8자 이상, 대소문자+숫자 포함)
+
+### 보호된 라우트
+인증이 필요한 페이지:
+- `/baby` - 신생아 작명 신청
+- `/rename` - 개명 신청
+- `/company` - 회사명 작명 신청
+- `/result/*` - 작명 결과 조회
+
+인증되지 않은 사용자가 접근 시 자동으로 `/login`으로 리다이렉트됩니다.
+
+### 인증 기술 스택
+- **NextAuth.js v5**: 인증 프레임워크
+- **bcryptjs**: 비밀번호 해싱 (salt rounds: 10)
+- **JWT**: 세션 관리
+- **Zod**: 입력 유효성 검증
+- **React Hook Form**: 폼 관리
+
+## 프로젝트 구조 상세
+
+```
+naming-service/
+├── app/
+│   ├── (auth)/              # 인증 라우트 그룹 (별도 레이아웃)
+│   │   ├── login/           # 로그인 페이지
+│   │   │   └── page.tsx
+│   │   └── signup/          # 회원가입 페이지
+│   │       └── page.tsx
+│   ├── (main)/              # 메인 서비스 라우트 (보호됨)
+│   │   ├── baby/            # 신생아 작명
+│   │   ├── rename/          # 개명
+│   │   ├── company/         # 회사명
+│   │   └── result/[id]/     # 결과 페이지
+│   ├── actions/             # Server Actions
+│   │   └── auth.ts          # 인증 액션 (회원가입, 로그인)
+│   ├── api/
+│   │   └── auth/
+│   │       └── [...nextauth]/
+│   │           └── route.ts # NextAuth API 핸들러
+│   └── page.tsx             # 메인 랜딩 페이지
+├── components/
+│   └── ui/                  # 재사용 가능한 UI 컴포넌트
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       ├── select.tsx
+│       └── form.tsx         # react-hook-form 통합
+├── lib/
+│   ├── auth.ts              # NextAuth 설정
+│   ├── db.ts                # Prisma 클라이언트 싱글톤
+│   └── utils.ts             # 유틸리티 함수 (cn 등)
+├── prisma/
+│   └── schema.prisma        # 데이터베이스 스키마
+└── middleware.ts            # 인증 미들웨어
+```
 
 ## 라이센스
 

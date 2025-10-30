@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma 스키마 파일
+// 한국 전통 작명소 데이터베이스 스키마
 
 generator client {
   provider = "prisma-client-js"
@@ -10,43 +10,92 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 사용자 모델
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
-  password  String?
+  password  String   // bcrypt 해시된 비밀번호
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  namingRequests NamingRequest[]
+  namingRequests NamingRequest[] // 사용자의 작명 요청 목록
 
   @@map("users")
 }
 
+// 작명 요청 모델
 model NamingRequest {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // "baby", "rename", "company"
-  input     Json     // 입력 데이터 (생년월일, 성씨 등)
-  status    String   @default("pending") // "pending", "processing", "completed", "failed"
+  id     String        @id @default(cuid())
+  userId String
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type   NamingType    // 작명 유형 (신생아/개명/회사명/예명)
+  status RequestStatus @default(PENDING) // 요청 상태
+
+  // 입력 데이터
+  familyName String  // 성씨
+  gender     Gender? // 성별 (선택)
+  birthDate  DateTime? // 생년월일
+  birthTime  String? // 태어난 시간 (예: "14:30")
+  isLunar    Boolean @default(false) // 음력 여부
+  method     NamingMethod // 작명 방법
+
+  // 추가 옵션 및 선호사항 (JSON)
+  // 예: { "avoidCharacters": ["凶", "殺"], "preferredMeaning": "밝음, 지혜" }
+  preferences Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  result NamingResult?
+  results NamingResult[] // 작명 결과 목록 (여러 결과 가능)
 
   @@map("naming_requests")
 }
 
+// 작명 결과 모델
 model NamingResult {
-  id          String   @id @default(cuid())
-  requestId   String   @unique
-  suggestions Json     // 추천 이름 목록
-  analysis    Json     // 사주팔자 분석 결과
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String        @id @default(cuid())
+  requestId String
+  request   NamingRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
-  request NamingRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  // 결과 데이터 (JSON 형식)
+  suggestions  Json // 이름 후보들: [{ name: "지혜", hanja: "智慧", meaning: "...", score: 95 }, ...]
+  sajuAnalysis Json? // 사주팔자 분석: { elements: {...}, yongsin: "...", analysis: "..." }
+  hanjaOptions Json? // 한자 옵션: [{ char: "智", meaning: "지혜", strokes: 12, element: "火" }, ...]
+
+  createdAt DateTime @default(now())
 
   @@map("naming_results")
+}
+
+// Enums
+
+// 작명 유형
+enum NamingType {
+  BABY       // 신생아 작명
+  RENAME     // 개명
+  COMPANY    // 회사명·상호
+  STAGE_NAME // 예명·필명
+}
+
+// 성별
+enum Gender {
+  MALE    // 남성
+  FEMALE  // 여성
+  NEUTRAL // 중성 (회사명 등)
+}
+
+// 작명 방법
+enum NamingMethod {
+  TRADITIONAL // 사주팔자 중심 (전통 방식)
+  MODERN      // 언어학/현대적 감각 중심
+  HYBRID      // 종합 (전통 + 현대)
+}
+
+// 요청 상태
+enum RequestStatus {
+  PENDING    // 대기 중
+  PROCESSING // 처리 중
+  COMPLETED  // 완료
+  FAILED     // 실패
 }
