@@ -1,0 +1,17 @@
+# Dependencies accidentally created at root level
+node_modules/
+package-lock.json
+package.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
