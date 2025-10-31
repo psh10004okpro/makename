@@ -210,6 +210,23 @@ export interface OhangAnalysis {
   strength: '강' | '중' | '약'
   /** 분석 설명 */
   description: string
+  /** 계절 조후 조정 정보 (선택사항) */
+  johooAdjustment?: {
+    season: {
+      season: 'SPRING' | 'SUMMER' | 'FALL' | 'WINTER'
+      seasonName: string
+      dominantElement: Ohang
+      weakElements: Ohang[]
+      preferredYongsin: Ohang[]
+      avoidedElements: Ohang[]
+      description: string
+      characteristics: string[]
+    }
+    originalYongsin: Ohang[]
+    adjustedYongsin: Ohang[]
+    adjustmentReason: string
+    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+  }
 }
 
 // ============================================================================

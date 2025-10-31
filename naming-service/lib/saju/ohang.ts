@@ -14,6 +14,7 @@ import type {
   OhangAnalysis,
 } from './types'
 import { OHANG_LIST } from './types'
+import { adjustYongsinBySeason, type JohooAdjustment } from './johoo'
 
 // ============================================================================
 // 오행 매핑 데이터
@@ -174,17 +175,22 @@ export function countOhang(saju: Saju): OhangCount {
  * 오행 균형 분석
  *
  * @param saju 사주팔자
+ * @param birthDate 출생일 (계절 조후 분석에 사용, 선택사항)
  * @returns 오행 분석 결과
  *
  * @example
  * ```typescript
- * const analysis = analyzeOhangBalance(saju)
+ * const analysis = analyzeOhangBalance(saju, new Date('2023-05-15'))
  * console.log(analysis.strong) // ['목', '토']
  * console.log(analysis.weak)   // ['화', '수']
  * console.log(analysis.yongsin) // ['화', '금']
+ * console.log(analysis.johooAdjustment) // 계절 조후 정보
  * ```
  */
-export function analyzeOhangBalance(saju: Saju): OhangAnalysis {
+export function analyzeOhangBalance(
+  saju: Saju,
+  birthDate?: Date
+): OhangAnalysis {
   const count = countOhang(saju)
 
   // 강한 오행 (3개 이상)
@@ -205,7 +211,15 @@ export function analyzeOhangBalance(saju: Saju): OhangAnalysis {
   })
 
   // 용신 추출 (부족한 오행을 보충)
-  const yongsin = extractYongsin(saju, count, weak, missing)
+  let yongsin = extractYongsin(saju, count, weak, missing)
+
+  // 계절 조후 적용 (출생일이 제공된 경우)
+  let johooAdjustment: JohooAdjustment | undefined
+  if (birthDate) {
+    const birthMonth = birthDate.getMonth() + 1 // 1-12
+    johooAdjustment = adjustYongsinBySeason(yongsin, birthMonth)
+    yongsin = johooAdjustment.adjustedYongsin
+  }
 
   // 기신 (피해야 할 오행, 주로 과다한 오행)
   const gisin = [...strong]
@@ -216,7 +230,14 @@ export function analyzeOhangBalance(saju: Saju): OhangAnalysis {
   const strength = ilganCount >= 3 ? '강' : ilganCount === 1 ? '약' : '중'
 
   // 분석 설명 생성
-  const description = generateAnalysisDescription(count, strong, weak, missing, yongsin)
+  const description = generateAnalysisDescription(
+    count,
+    strong,
+    weak,
+    missing,
+    yongsin,
+    johooAdjustment
+  )
 
   return {
     count,
@@ -227,6 +248,7 @@ export function analyzeOhangBalance(saju: Saju): OhangAnalysis {
     gisin,
     strength,
     description,
+    johooAdjustment, // 계절 조후 정보 추가
   }
 }
 
@@ -288,7 +310,8 @@ function generateAnalysisDescription(
   strong: Ohang[],
   weak: Ohang[],
   missing: Ohang[],
-  yongsin: Ohang[]
+  yongsin: Ohang[],
+  johooAdjustment?: JohooAdjustment
 ): string {
   const parts: string[] = []
 
@@ -308,6 +331,16 @@ function generateAnalysisDescription(
   // 없는 오행
   if (missing.length > 0) {
     parts.push(`부족한 오행: ${missing.join(', ')}`)
+  }
+
+  // 계절 조후 정보 (있는 경우)
+  if (johooAdjustment) {
+    parts.push(
+      `계절: ${johooAdjustment.season.seasonName} (${johooAdjustment.season.dominantElement} 왕성)`
+    )
+    if (johooAdjustment.priority === 'HIGH') {
+      parts.push(`⚠️ ${johooAdjustment.adjustmentReason}`)
+    }
   }
 
   // 용신

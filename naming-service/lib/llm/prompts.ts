@@ -160,6 +160,32 @@ export function createUserPrompt(context: PromptContext): string {
       parts.push(`**기신 (해로운 오행)**: ${saju.gisin.join(', ')} ⚠️ 피할 것`)
     }
 
+    // 계절 조후 정보 (추가)
+    if (saju.seasonalInfo) {
+      parts.push('')
+      parts.push('### 🌸 계절 조후 (調候)')
+      parts.push('')
+      parts.push(`**출생 계절**: ${saju.seasonalInfo.seasonName}`)
+      parts.push(`**주도 오행**: ${saju.seasonalInfo.dominantElement} ← 이 계절은 ${saju.seasonalInfo.dominantElement} 기운이 왕성`)
+      parts.push('')
+
+      if (saju.seasonalInfo.adjustmentReason) {
+        parts.push(`**조후 설명**: ${saju.seasonalInfo.adjustmentReason}`)
+        parts.push('')
+      }
+
+      parts.push(`**계절 특성**:`)
+      saju.seasonalInfo.characteristics?.forEach((char: string, i: number) => {
+        parts.push(`  ${i + 1}. ${char}`)
+      })
+      parts.push('')
+
+      parts.push(`✅ **선호 오행**: ${saju.seasonalInfo.preferredYongsin?.join(', ')} ← 계절 조후에 가장 적합`)
+      parts.push(`⚠️ **주의 오행**: ${saju.seasonalInfo.avoidedElements?.join(', ')} ← 계절상 과도하므로 피할 것`)
+      parts.push('')
+      parts.push('💡 **계절 조후 작명 원칙**: 계절의 지나친 기운을 조절하고, 부족한 기운을 보완하는 한자를 사용하세요.')
+    }
+
     parts.push('')
     parts.push('💡 **작명 지침**: 사주의 약한 오행(특히 결여된 오행)을 보완하고, 용신 오행을 가진 한자를 우선적으로 사용하세요. 강한 오행과 기신 오행은 피하세요.')
     parts.push('')

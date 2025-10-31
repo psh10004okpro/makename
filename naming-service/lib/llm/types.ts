@@ -9,6 +9,32 @@ import { Saju, OhangAnalysis } from '../saju/types'
 import { Ohang } from '../saju/types'
 
 /**
+ * 계절 조후 정보
+ */
+export interface SeasonalInfo {
+  /** 계절 */
+  season: 'SPRING' | 'SUMMER' | 'FALL' | 'WINTER'
+  /** 계절 이름 (한글) */
+  seasonName: string
+  /** 주도 오행 */
+  dominantElement: Ohang
+  /** 약한 오행 */
+  weakElements: Ohang[]
+  /** 선호 용신 */
+  preferredYongsin: Ohang[]
+  /** 피해야 할 오행 */
+  avoidedElements: Ohang[]
+  /** 계절 설명 */
+  description: string
+  /** 계절 특성 */
+  characteristics: string[]
+  /** 조정 이유 */
+  adjustmentReason?: string
+  /** 조정 우선순위 */
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW'
+}
+
+/**
  * 사주 분석 요약 (LLM 전달용)
  */
 export interface SajuAnalysisSummary {
@@ -30,6 +56,8 @@ export interface SajuAnalysisSummary {
   yongsin: Ohang[]
   /** 기신 (해로운 오행) */
   gisin: Ohang[]
+  /** 계절 조후 정보 (선택사항) */
+  seasonalInfo?: SeasonalInfo
 }
 
 /**
