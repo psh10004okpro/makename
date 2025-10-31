@@ -33,6 +33,24 @@ export interface SajuAnalysisSummary {
 }
 
 /**
+ * 사용자 정의 가중치
+ */
+export interface CustomWeights {
+  /** 사주 오행 조화 가중치 (0-100) */
+  saju?: number
+  /** 획수 길흉 가중치 (0-100) */
+  strokes?: number
+  /** 발음 자연스러움 가중치 (0-100) */
+  phonetics?: number
+  /** 의미 적절성 가중치 (0-100) */
+  meaning?: number
+  /** 현대적 감각 가중치 (0-100) */
+  modernity?: number
+  /** 독창성 가중치 (0-100) */
+  uniqueness?: number
+}
+
+/**
  * 작명 선호도
  */
 export interface NamingPreferences {
@@ -48,6 +66,8 @@ export interface NamingPreferences {
   koreanOnly?: boolean
   /** 특별한 요청사항 */
   specialRequests?: string
+  /** 사용자 정의 가중치 (합계가 100이 되도록 자동 정규화) */
+  customWeights?: CustomWeights
 }
 
 /**

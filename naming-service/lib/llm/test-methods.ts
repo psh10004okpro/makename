@@ -37,10 +37,10 @@ function testNamingMethods() {
     },
   }
 
-  const methods = ['TRADITIONAL', 'MODERN', 'HYBRID'] as const
+  const methods = ['TRADITIONAL', 'MODERN', 'HYBRID', 'CREATIVE', 'INTERNATIONAL'] as const
 
   methods.forEach((method, index) => {
-    console.log(`\n${index + 1}. ${getMethodEmoji(method)} ${getMethodName(method)} 작명\n`)
+    console.log(`\n${index + 1}. ${getMethodEmoji(method)} ${getMethodName(method)}\n`)
     console.log('-'.repeat(80))
 
     const request = { ...baseRequest, method }
@@ -51,15 +51,17 @@ function testNamingMethods() {
     const methodSection = extractMethodSection(prompt.system, method)
 
     console.log('📋 적용된 가이드라인:\n')
-    console.log(methodSection)
+    console.log(methodSection.substring(0, 500) + '...(생략)...')
     console.log('\n' + '='.repeat(80))
   })
 
   console.log('\n✅ 작명 방법별 프롬프트 생성 테스트 완료!\n')
   console.log('💡 각 방법의 차이점:\n')
-  console.log('  🏛️  TRADITIONAL: 사주/오행/획수 중심 (전통 90%, 발음 10%)')
-  console.log('  🌟 MODERN: 발음/의미/현대성 중심 (현대 85%, 사주 10%)')
-  console.log('  ⚖️  HYBRID: 전통과 현대의 균형 (전통 35%, 현대 35%, 조화 30%)')
+  console.log('  🏛️  TRADITIONAL: 사주/오행/획수 중심 (사주 40%, 획수 30%)')
+  console.log('  🌟 MODERN: 발음/의미/현대성 중심 (발음 40%, 의미 30%)')
+  console.log('  ⚖️  HYBRID: 전통과 현대의 균형 (발음+의미 35%, 사주 35%)')
+  console.log('  🎨 CREATIVE: 독창성/의미 깊이 중심 (독창성 50%, 의미 30%)')
+  console.log('  🌍 INTERNATIONAL: 국제 발음/글로벌 이미지 (발음 45%, 이미지 30%)')
   console.log()
 }
 
@@ -71,6 +73,8 @@ function extractMethodSection(systemPrompt: string, method: string): string {
     TRADITIONAL: '🏛️ 전통 작명 방식',
     MODERN: '🌟 현대 작명 방식',
     HYBRID: '⚖️ 혼합 작명 방식',
+    CREATIVE: '🎨 창의적 작명 방식',
+    INTERNATIONAL: '🌍 국제적 작명 방식',
   }
 
   const marker = methodMarkers[method]
@@ -97,6 +101,8 @@ function getMethodName(method: string): string {
     TRADITIONAL: '전통 작명',
     MODERN: '현대 작명',
     HYBRID: '혼합 작명',
+    CREATIVE: '창의적 작명',
+    INTERNATIONAL: '국제적 작명',
   }
   return names[method] || method
 }
@@ -109,6 +115,8 @@ function getMethodEmoji(method: string): string {
     TRADITIONAL: '🏛️',
     MODERN: '🌟',
     HYBRID: '⚖️',
+    CREATIVE: '🎨',
+    INTERNATIONAL: '🌍',
   }
   return emojis[method] || '📝'
 }

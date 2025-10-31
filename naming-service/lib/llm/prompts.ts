@@ -198,6 +198,48 @@ export function createUserPrompt(context: PromptContext): string {
     parts.push('')
   }
 
+  // 사용자 정의 가중치
+  if (request.preferences?.customWeights) {
+    parts.push('## ⚙️ 사용자 정의 가중치\n')
+    const weights = request.preferences.customWeights
+
+    // 가중치 정규화 (합계 100으로)
+    const total = (weights.saju || 0) + (weights.strokes || 0) +
+                  (weights.phonetics || 0) + (weights.meaning || 0) +
+                  (weights.modernity || 0) + (weights.uniqueness || 0)
+
+    if (total > 0) {
+      const normalize = (value: number | undefined) =>
+        value ? Math.round((value / total) * 100) : 0
+
+      parts.push('**⚠️ 중요: 아래 가중치를 반드시 준수하세요!**\n')
+
+      if (weights.saju) {
+        parts.push(`- 🎯 **사주 오행 조화**: ${normalize(weights.saju)}% (용신/기신 오행 일치도)`)
+      }
+      if (weights.strokes) {
+        parts.push(`- 📏 **획수 길흉**: ${normalize(weights.strokes)}% (81수리, 오격 분석)`)
+      }
+      if (weights.phonetics) {
+        parts.push(`- 🗣️ **발음 자연스러움**: ${normalize(weights.phonetics)}% (받침, 모음, 듣기 편함)`)
+      }
+      if (weights.meaning) {
+        parts.push(`- 💡 **의미 적절성**: ${normalize(weights.meaning)}% (키워드 일치, 긍정적 의미)`)
+      }
+      if (weights.modernity) {
+        parts.push(`- ✨ **현대적 감각**: ${normalize(weights.modernity)}% (트렌디, 세련됨)`)
+      }
+      if (weights.uniqueness) {
+        parts.push(`- 🌟 **독창성**: ${normalize(weights.uniqueness)}% (흔하지 않음, 참신함)`)
+      }
+
+      parts.push('')
+      parts.push('💡 **작명 시**: 위 가중치에 따라 각 항목의 중요도를 조절하세요.')
+      parts.push('   예를 들어, 사주 40%면 전체 평가에서 사주를 가장 중시해야 합니다.')
+      parts.push('')
+    }
+  }
+
   // 작명 요청
   parts.push('---\n')
   parts.push('위 정보를 바탕으로 **20개의 좋은 이름**을 제안해주세요.')
@@ -233,6 +275,8 @@ function getMethodText(method: string): string {
     TRADITIONAL: '전통 작명 (사주명리학 기반)',
     MODERN: '현대 작명 (의미와 발음 중심)',
     HYBRID: '혼합 작명 (전통과 현대의 조화)',
+    CREATIVE: '창의적 작명 (독특하고 예술적인 이름)',
+    INTERNATIONAL: '국제적 작명 (글로벌 통용 이름)',
   }
   return methodMap[method] || method
 }
@@ -353,6 +397,121 @@ function getMethodGuideline(method: string): string {
 - strokes: 80점 이상
 - phonetics: 85점 이상
 - total: 85점 이상 목표
+`,
+    CREATIVE: `
+## 🎨 창의적 작명 방식 적용
+
+**이번 작명은 독특하고 창의적인 이름을 추구합니다.**
+
+### 우선순위 (가중치)
+1. **독창성과 차별성** (50%) - 가장 중요
+   - 기존에 없는 참신한 조합
+   - 흔하지 않은 한자나 순우리말 활용
+   - 예술적이고 문학적인 감각
+   - 의외의 조합이지만 조화로운 이름
+
+2. **의미의 깊이** (30%) - 매우 중요
+   - 다층적이고 함축적인 의미
+   - 이야기가 있는 이름
+   - 철학적이거나 시적인 뜻
+   - 사용자 요청 키워드를 창의적으로 해석
+
+3. **발음 미학** (15%) - 중요
+   - 음악적 리듬감
+   - 독특하지만 발음하기 편함
+   - 기억하기 쉬운 이름
+   - 예술적 어감
+
+4. **사주 조화** (5%) - 참고
+   - 기본적인 오행 균형만 고려
+   - 극단적인 불균형만 피함
+
+### 작명 스타일
+- **창의적 이름 18개** (예: 하늘, 달빛, 온새미로, 은솔 등)
+- 전통적 이름 2개 (참고용)
+- 순우리말 이름 적극 활용 (8-12개)
+- 특이한 한자 조합 (5-8개)
+- 3음절 이름도 자유롭게 포함
+
+### 궁합도 점수 산정
+- uniqueness: 95점 이상 목표 (독창성 최우선)
+- meaningRelevance: 90점 이상 목표 (깊은 의미)
+- phonetics: 80점 이상 (예술적 발음)
+- saju: 60점 이상 (참고)
+- total: 80점 이상 목표
+
+### 창의적 작명 기법
+- **순우리말**: 하늘, 바다, 이슬, 별, 온새미로, 다솜 등
+- **신조어 조합**: 의미있는 글자의 새로운 결합
+- **희귀 한자**: 잘 쓰이지 않지만 아름다운 한자 활용
+- **문학적 표현**: 시적이고 예술적인 이름
+- **자연 모티프**: 자연물에서 영감을 받은 이름
+
+### 주의사항
+⚠️ 창의적이되 너무 기이하지 않도록 주의
+✅ 일상생활에서 사용 가능한 수준 유지
+✅ 아이가 자라면서 좋아할 만한 이름
+`,
+    INTERNATIONAL: `
+## 🌍 국제적 작명 방식 적용
+
+**이번 작명은 국제적으로 통용되는 이름을 추구합니다.**
+
+### 우선순위 (가중치)
+1. **국제 발음 용이성** (45%) - 가장 중요
+   - 영어권에서 발음하기 쉬운 이름
+   - 자음 'ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅅ, ㅇ' 위주
+   - 모음 'ㅏ, ㅓ, ㅗ, ㅜ, ㅣ' 중심
+   - 받침 최소화 (있어도 ㄴ, ㅇ 정도)
+   - 2음절 기본, 3음절도 가능
+
+2. **글로벌 이미지** (30%) - 매우 중요
+   - 다국적 기업이나 국제무대에 어울림
+   - 영어 이름과 유사한 느낌
+   - 세련되고 모던한 이미지
+   - 문화적 장벽 없는 이름
+
+3. **의미의 보편성** (20%) - 중요
+   - 전 세계적으로 긍정적인 의미
+   - 특정 문화권에 국한되지 않음
+   - 희망, 평화, 사랑 등 보편적 가치
+   - 사용자 요청 키워드를 글로벌하게 해석
+
+4. **사주 조화** (5%) - 참고
+   - 기본적인 오행만 참고
+   - 국제성이 우선
+
+### 작명 스타일
+- **국제적 이름 16개** (예: 리나, 민아, 지나, 유나, 안나 등)
+- 전통적 이름 2개 (비교용)
+- 균형잡힌 이름 2개
+- 한글 이름 위주 (한자 옵션은 선택사항)
+- 영어 표기가 간단한 이름
+
+### 궁합도 점수 산정
+- phonetics: 95점 이상 목표 (국제 발음 최우선)
+- modernity: 90점 이상 목표 (글로벌 이미지)
+- meaningRelevance: 85점 이상 (보편적 의미)
+- saju: 60점 이상 (참고)
+- total: 85점 이상 목표
+
+### 영어 표기 친화적인 패턴
+- **-na 종결**: 리나(Lina), 지나(Gina), 유나(Yuna), 미나(Mina)
+- **-ah 종결**: 민아(Mina), 서아(Seoa), 예아(Yea)
+- **-ra/ri 종결**: 서라(Sera), 유리(Yuri), 수리(Suri)
+- **-an 종결**: 지안(Jian), 서안(Seoan)
+- **-o 종결**: 유노(Yuno), 미오(Mio)
+
+### 발음 가이드
+✅ 좋은 예: 리나(Lina), 민아(Mina), 유진(Eugene)
+❌ 피할 예: 경희(Kyung-hee 발음 어려움), 준혁(Jun-hyuk 받침 많음)
+
+### 국제 이름 체크리스트
+- [ ] 영어권에서 2초 안에 발음 가능한가?
+- [ ] 영어 표기가 5-6자 이내인가?
+- [ ] 특이한 발음(ㅆ, ㅉ, ㅃ 등) 없는가?
+- [ ] 받침이 없거나 ㄴ, ㅇ만 있는가?
+- [ ] 글로벌 기업 CEO 이름으로 어색하지 않은가?
 `,
   }
 
