@@ -12,6 +12,8 @@ import { analyzeSipseong } from '@/lib/saju/sipseong'
 import { analyzeDaeun } from '@/lib/saju/daeun'
 import { analyzeGyeokguk } from '@/lib/saju/gyeokguk'
 import { getSeasonalYongsin } from '@/lib/saju/johoo'
+import { getCache, CacheKeys, CacheTTL } from '@/lib/cache'
+import { withRateLimit, RateLimitPresets } from '@/lib/middleware/rate-limit'
 
 interface AnalyzeSajuRequest {
   /** 생년월일 (ISO 8601 형식) */
@@ -52,7 +54,7 @@ interface AnalyzeSajuResponse {
   error?: string
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeSajuResponse>> {
+async function handlePOST(request: NextRequest): Promise<NextResponse<AnalyzeSajuResponse>> {
   try {
     const body: AnalyzeSajuRequest = await request.json()
 
@@ -88,6 +90,29 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeSa
         { status: 400 }
       )
     }
+
+    // 캐시 키 생성
+    const cache = getCache()
+    const cacheKey = CacheKeys.saju(
+      birthDate,
+      body.birthTime,
+      body.isLunar || false,
+      body.gender
+    )
+    const ageSuffix = body.currentAge ? `:age${body.currentAge}` : ''
+    const fullCacheKey = `${cacheKey}${ageSuffix}`
+
+    // 캐시 확인
+    const cachedResult = await cache.get<any>(fullCacheKey)
+    if (cachedResult) {
+      console.log('✅ 캐시 히트:', fullCacheKey)
+      return NextResponse.json({
+        success: true,
+        data: cachedResult,
+      })
+    }
+
+    console.log('❌ 캐시 미스:', fullCacheKey)
 
     // 1. 사주 계산
     const saju = calculateSaju(birthDate, {
@@ -174,6 +199,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeSa
       },
     }
 
+    // 캐시 저장 (7일간 유효)
+    await cache.set(fullCacheKey, responseData, CacheTTL.SAJU_ANALYSIS)
+    console.log('💾 캐시 저장:', fullCacheKey)
+
     return NextResponse.json({
       success: true,
       data: responseData,
@@ -189,3 +218,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeSa
     )
   }
 }
+
+// Rate limiting 적용
+export const POST = withRateLimit(handlePOST, RateLimitPresets.SAJU_ANALYSIS)

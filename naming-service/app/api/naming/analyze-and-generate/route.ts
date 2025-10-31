@@ -15,6 +15,7 @@ import { getSeasonalYongsin } from '@/lib/saju/johoo'
 import { generateNames } from '@/lib/llm'
 import type { NamingRequest, NamingResponse } from '@/lib/llm'
 import { Gender, NamingMethod } from '@prisma/client'
+import { withRateLimit, RateLimitPresets } from '@/lib/middleware/rate-limit'
 
 interface AnalyzeAndGenerateRequest {
   /** 성씨 */
@@ -65,7 +66,7 @@ interface AnalyzeAndGenerateResponse {
   error?: string
 }
 
-export async function POST(
+async function handlePOST(
   request: NextRequest
 ): Promise<NextResponse<AnalyzeAndGenerateResponse>> {
   try {
@@ -331,3 +332,6 @@ export async function POST(
     )
   }
 }
+
+// Rate limiting 적용
+export const POST = withRateLimit(handlePOST, RateLimitPresets.INTEGRATED_ANALYSIS)

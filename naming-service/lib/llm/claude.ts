@@ -17,6 +17,7 @@ import {
 } from './types'
 import { createFullPrompt, createRetryPrompt } from './prompts'
 import { validateAndRefineLLMResponse } from './validator'
+import { LLMRateLimiter } from '@/lib/middleware/rate-limit'
 
 /**
  * 기본 설정
@@ -162,6 +163,9 @@ export class ClaudeNamingService {
     usage: { input_tokens: number; output_tokens: number }
   }> {
     try {
+      // Rate limiting: LLM API 호출 제한 (최소 1초 간격)
+      await LLMRateLimiter.waitForNextCall()
+
       const message = await this.client.messages.create({
         model: this.config.model!,
         max_tokens: this.config.maxTokens!,

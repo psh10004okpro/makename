@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateNames } from '@/lib/llm'
 import type { NamingRequest, NamingResponse } from '@/lib/llm'
 import { Gender, NamingMethod } from '@prisma/client'
+import { withRateLimit, RateLimitPresets } from '@/lib/middleware/rate-limit'
 
 interface GenerateNamesApiRequest {
   /** 성씨 */
@@ -64,7 +65,7 @@ interface GenerateNamesApiResponse {
   error?: string
 }
 
-export async function POST(
+async function handlePOST(
   request: NextRequest
 ): Promise<NextResponse<GenerateNamesApiResponse>> {
   try {
@@ -158,3 +159,6 @@ export async function POST(
     )
   }
 }
+
+// Rate limiting 적용
+export const POST = withRateLimit(handlePOST, RateLimitPresets.AI_NAMING)
