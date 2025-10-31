@@ -11,9 +11,12 @@
     "prisma:studio": "prisma studio",
     "prisma:migrate": "prisma migrate dev",
     "seed": "tsx lib/hanja/seed.ts",
-    "test:hanja": "tsx lib/hanja/test.ts"
+    "test:hanja": "tsx lib/hanja/test.ts",
+    "test:llm": "tsx lib/llm/test.ts",
+    "test:llm-validation": "tsx lib/llm/test-validation.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^6.18.0",
     "@radix-ui/react-form": "^0.1.8",
