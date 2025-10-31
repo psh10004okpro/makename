@@ -122,6 +122,137 @@ export const OHANG_HANJA: Record<Ohang, string> = {
 export type Eumyang = '양' | '음'
 
 // ============================================================================
+// 십성 (十星) - Ten Stars
+// ============================================================================
+
+/**
+ * 십성 (10가지 신)
+ * 일간을 기준으로 다른 천간/지지와의 오행 관계를 나타냄
+ */
+export type Sipseong =
+  | '비견' // 比肩 - 같은 오행, 같은 음양
+  | '겁재' // 劫財 - 같은 오행, 다른 음양
+  | '식신' // 食神 - 내가 생하는 오행, 같은 음양
+  | '상관' // 傷官 - 내가 생하는 오행, 다른 음양
+  | '편재' // 偏財 - 내가 극하는 오행, 같은 음양
+  | '정재' // 正財 - 내가 극하는 오행, 다른 음양
+  | '편관' // 偏官(七殺) - 나를 극하는 오행, 같은 음양
+  | '정관' // 正官 - 나를 극하는 오행, 다른 음양
+  | '편인' // 偏印(梟神) - 나를 생하는 오행, 같은 음양
+  | '정인' // 正印 - 나를 생하는 오행, 다른 음양
+
+/**
+ * 십성 배열 (순서대로)
+ */
+export const SIPSEONG_LIST: Sipseong[] = [
+  '비견', '겁재', '식신', '상관', '편재', '정재', '편관', '정관', '편인', '정인'
+]
+
+/**
+ * 십성 한자 매핑
+ */
+export const SIPSEONG_HANJA: Record<Sipseong, string> = {
+  '비견': '比肩',
+  '겁재': '劫財',
+  '식신': '食神',
+  '상관': '傷官',
+  '편재': '偏財',
+  '정재': '正財',
+  '편관': '偏官',
+  '정관': '正官',
+  '편인': '偏印',
+  '정인': '正印',
+}
+
+/**
+ * 십성 별칭 (다른 이름)
+ */
+export const SIPSEONG_ALIAS: Record<Sipseong, string[]> = {
+  '비견': ['比肩'],
+  '겁재': ['劫財'],
+  '식신': ['食神'],
+  '상관': ['傷官'],
+  '편재': ['偏財'],
+  '정재': ['正財'],
+  '편관': ['七殺', '칠살'],
+  '정관': ['正官'],
+  '편인': ['梟神', '효신', '도식'],
+  '정인': ['正印'],
+}
+
+/**
+ * 십성 분류 (5가지 그룹)
+ */
+export type SipseongCategory = '비겁' | '식상' | '재성' | '관성' | '인성'
+
+/**
+ * 십성 카테고리 매핑
+ */
+export const SIPSEONG_CATEGORY: Record<Sipseong, SipseongCategory> = {
+  '비견': '비겁',
+  '겁재': '비겁',
+  '식신': '식상',
+  '상관': '식상',
+  '편재': '재성',
+  '정재': '재성',
+  '편관': '관성',
+  '정관': '관성',
+  '편인': '인성',
+  '정인': '인성',
+}
+
+/**
+ * 십성 개수
+ */
+export interface SipseongCount {
+  비견: number
+  겁재: number
+  식신: number
+  상관: number
+  편재: number
+  정재: number
+  편관: number
+  정관: number
+  편인: number
+  정인: number
+}
+
+/**
+ * 십성 분석 결과
+ */
+export interface SipseongAnalysis {
+  /** 일간 */
+  ilgan: Cheongan
+  /** 일간 오행 */
+  ilganOhang: Ohang
+  /** 일간 음양 */
+  ilganEumyang: Eumyang
+  /** 사주 8글자의 십성 */
+  pillars: {
+    year: { cheongan: Sipseong; jiji: Sipseong }
+    month: { cheongan: Sipseong; jiji: Sipseong }
+    day: { cheongan: Sipseong; jiji: Sipseong } // 일간은 제외, 일지만 포함
+    hour: { cheongan: Sipseong; jiji: Sipseong }
+  }
+  /** 십성 개수 통계 */
+  count: SipseongCount
+  /** 강한 십성 (3개 이상) */
+  strong: Sipseong[]
+  /** 약한 십성 (1개) */
+  weak: Sipseong[]
+  /** 없는 십성 (0개) */
+  missing: Sipseong[]
+  /** 십성 균형 설명 */
+  description: string
+  /** 성격 특성 */
+  personality: string[]
+  /** 재능 및 적성 */
+  talents: string[]
+  /** 주의사항 */
+  warnings: string[]
+}
+
+// ============================================================================
 // 사주 기둥 (四柱) - Four Pillars
 // ============================================================================
 

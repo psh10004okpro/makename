@@ -16,7 +16,8 @@
     "test:llm-validation": "tsx lib/llm/test-validation.ts",
     "test:quality": "tsx lib/llm/test-quality.ts",
     "test:methods": "tsx lib/llm/test-methods.ts",
-    "test:johoo": "tsx lib/saju/test-johoo.ts"
+    "test:johoo": "tsx lib/saju/test-johoo.ts",
+    "test:sipseong": "tsx lib/saju/test-sipseong.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

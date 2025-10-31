@@ -35,6 +35,26 @@ export interface SeasonalInfo {
 }
 
 /**
+ * 십성 정보 (LLM 전달용)
+ */
+export interface SipseongInfo {
+  /** 강한 십성 */
+  strong: string[]
+  /** 약한 십성 */
+  weak: string[]
+  /** 없는 십성 */
+  missing: string[]
+  /** 성격 특성 */
+  personality: string[]
+  /** 재능 및 적성 */
+  talents: string[]
+  /** 주의사항 */
+  warnings: string[]
+  /** 십성 개수 요약 */
+  summary: string
+}
+
+/**
  * 사주 분석 요약 (LLM 전달용)
  */
 export interface SajuAnalysisSummary {
@@ -58,6 +78,8 @@ export interface SajuAnalysisSummary {
   gisin: Ohang[]
   /** 계절 조후 정보 (선택사항) */
   seasonalInfo?: SeasonalInfo
+  /** 십성 분석 정보 (선택사항) */
+  sipseongInfo?: SipseongInfo
 }
 
 /**

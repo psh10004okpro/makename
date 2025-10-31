@@ -186,6 +186,50 @@ export function createUserPrompt(context: PromptContext): string {
       parts.push('💡 **계절 조후 작명 원칙**: 계절의 지나친 기운을 조절하고, 부족한 기운을 보완하는 한자를 사용하세요.')
     }
 
+    // 십성 분석 정보 (추가)
+    if (saju.sipseongInfo) {
+      parts.push('')
+      parts.push('### ⭐ 십성 (十星) 분석')
+      parts.push('')
+      parts.push(`**십성 분포**: ${saju.sipseongInfo.summary}`)
+      parts.push('')
+
+      if (saju.sipseongInfo.strong.length > 0) {
+        parts.push(`**강한 십성**: ${saju.sipseongInfo.strong.join(', ')}`)
+      }
+      if (saju.sipseongInfo.weak.length > 0) {
+        parts.push(`**약한 십성**: ${saju.sipseongInfo.weak.join(', ')}`)
+      }
+      if (saju.sipseongInfo.missing.length > 0) {
+        parts.push(`**결여된 십성**: ${saju.sipseongInfo.missing.join(', ')}`)
+      }
+      parts.push('')
+
+      if (saju.sipseongInfo.personality.length > 0) {
+        parts.push('**성격 특성**:')
+        saju.sipseongInfo.personality.forEach((trait, i) => {
+          parts.push(`  ${i + 1}. ${trait}`)
+        })
+        parts.push('')
+      }
+
+      if (saju.sipseongInfo.talents.length > 0) {
+        parts.push('**재능 및 적성**:')
+        parts.push(`  ${saju.sipseongInfo.talents.join(', ')}`)
+        parts.push('')
+      }
+
+      if (saju.sipseongInfo.warnings.length > 0) {
+        parts.push('**주의사항**:')
+        saju.sipseongInfo.warnings.forEach((warning, i) => {
+          parts.push(`  ${i + 1}. ${warning}`)
+        })
+        parts.push('')
+      }
+
+      parts.push('💡 **십성 작명 원칙**: 십성 분석을 통해 파악된 성격과 재능을 고려하여, 부족한 부분을 보완하고 강점을 살리는 이름을 지어주세요.')
+    }
+
     parts.push('')
     parts.push('💡 **작명 지침**: 사주의 약한 오행(특히 결여된 오행)을 보완하고, 용신 오행을 가진 한자를 우선적으로 사용하세요. 강한 오행과 기신 오행은 피하세요.')
     parts.push('')
