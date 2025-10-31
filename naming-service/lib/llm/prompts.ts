@@ -7,13 +7,15 @@
 import { NamingRequest, PromptContext } from './types'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { getActivePrompt } from './prompt-versions'
 
 /**
- * 시스템 프롬프트
+ * 시스템 프롬프트 (버전 관리)
  *
  * 작명가의 역할과 작명 원칙을 정의합니다.
+ * @deprecated 대신 getActivePrompt()를 사용하세요
  */
-export const NAMING_SYSTEM_PROMPT = `당신은 30년 경력의 전문 작명가입니다.
+export const NAMING_SYSTEM_PROMPT_LEGACY = `당신은 30년 경력의 전문 작명가입니다.
 한국의 전통 성명학, 사주명리학, 그리고 현대 언어학을 모두 마스터했습니다.
 
 ## 작명 철학
@@ -237,16 +239,37 @@ function getMethodText(method: string): string {
 
 /**
  * 프롬프트 전체 생성 (시스템 + 사용자)
+ *
+ * @param context 프롬프트 컨텍스트
+ * @param promptVersion 사용할 프롬프트 버전 (기본값: 활성화된 버전)
  */
-export function createFullPrompt(context: PromptContext): {
+export function createFullPrompt(
+  context: PromptContext,
+  promptVersion?: string
+): {
   system: string
   user: string
+  version: string
 } {
+  const activePrompt = promptVersion
+    ? require('./prompt-versions').getPromptVersion(promptVersion)
+    : getActivePrompt()
+
+  if (!activePrompt) {
+    throw new Error(`프롬프트 버전 ${promptVersion}을 찾을 수 없습니다`)
+  }
+
   return {
-    system: NAMING_SYSTEM_PROMPT,
+    system: activePrompt.systemPrompt,
     user: createUserPrompt(context),
+    version: activePrompt.version,
   }
 }
+
+/**
+ * 시스템 프롬프트 가져오기 (현재 활성 버전)
+ */
+export const NAMING_SYSTEM_PROMPT = getActivePrompt().systemPrompt
 
 /**
  * 재시도용 프롬프트 생성

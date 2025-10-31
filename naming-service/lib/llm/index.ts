@@ -49,6 +49,44 @@ export {
   validateResponseQuality,
 } from './validator'
 
+// 품질 평가
+export {
+  NameQualityEvaluator,
+  nameQualityEvaluator,
+  type QualityAssessment,
+  type QualityReport,
+  type QualityCriteria,
+} from './quality-evaluator'
+
+// 프롬프트 버전 관리
+export {
+  type PromptVersion,
+  PROMPT_V1,
+  PROMPT_V2,
+  PROMPT_VERSIONS,
+  getActivePrompt,
+  getPromptVersion,
+  getLatestPrompt,
+} from './prompt-versions'
+
+// A/B 테스트
+export {
+  ABTester,
+  abTester,
+  type ABTestResult,
+  type VersionResult,
+  type ABTestConfig,
+} from './ab-test'
+
+// 리포트 생성
+export {
+  printQualityReport,
+  printDetailedAssessment,
+  printABTestResult,
+  generateMarkdownReport,
+  generateCSV,
+} from './report-generator'
+
 /**
  * 기본 사용 예시
  *
