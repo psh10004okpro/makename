@@ -595,3 +595,140 @@ export interface SajuCalculationOptions {
   /** 절입시각 자동 조정 여부 */
   adjustJeolip?: boolean
 }
+
+// ============================================================================
+// 신살 (神殺) - Spirits and Deities
+// ============================================================================
+
+/**
+ * 신살 종류
+ */
+export type Sinsal =
+  | '천을귀인'  // 天乙貴人 - 귀인의 도움
+  | '천덕귀인'  // 天德貴人 - 하늘의 덕
+  | '월덕귀인'  // 月德貴人 - 달의 덕
+  | '도화살'    // 桃花殺 - 이성운, 예술
+  | '역마살'    // 驛馬殺 - 이동, 변화
+  | '양인'      // 羊刃 - 강한 기운
+  | '공망'      // 空亡 - 비어있음
+  | '천의성'    // 天醫星 - 의료 재능
+  | '문창귀인'  // 文昌貴人 - 학문
+  | '금여록'    // 金輿祿 - 재물
+  | '화개살'    // 華蓋殺 - 예술, 종교
+  | '백호대살'  // 白虎大殺 - 위험
+  | '괴강살'    // 魁罡殺 - 강한 성격
+
+/**
+ * 신살 정보
+ */
+export interface SinsalInfo {
+  /** 신살 이름 */
+  name: Sinsal
+  /** 한자 */
+  hanja: string
+  /** 출현 위치 (년/월/일/시) */
+  location: ('year' | 'month' | 'day' | 'hour')[]
+  /** 의미 */
+  meaning: string
+  /** 긍정적 영향 */
+  positive: string[]
+  /** 부정적 영향 */
+  negative: string[]
+  /** 직업 적성 */
+  careerSuitability: string[]
+  /** 작명 가이드 */
+  namingGuide: string
+}
+
+/**
+ * 신살 분석 결과
+ */
+export interface SinsalAnalysis {
+  /** 출현한 신살 목록 */
+  sinsals: SinsalInfo[]
+  /** 좋은 신살 */
+  goodSinsals: SinsalInfo[]
+  /** 나쁜 신살 */
+  badSinsals: string[]
+  /** 중립 신살 */
+  neutralSinsals: string[]
+  /** 직업 적성 (신살 기반) */
+  careerRecommendations: string[]
+  /** 성격 특성 (신살 기반) */
+  personality: string[]
+  /** 작명 가이드 */
+  namingRecommendations: string[]
+  /** 주의사항 */
+  warnings: string[]
+}
+
+// ============================================================================
+// 육친 (六親) - Six Relatives
+// ============================================================================
+
+/**
+ * 육친 관계
+ */
+export type Yukchin =
+  | '부모'      // 정인, 편인
+  | '형제자매'  // 비견, 겁재
+  | '자녀'      // 식신, 상관
+  | '배우자'    // 정재(남), 정관(여)
+  | '재물'      // 편재, 정재
+
+/**
+ * 육친 운세
+ */
+export type YukchinLuck = '매우 좋음' | '좋음' | '보통' | '약함' | '매우 약함'
+
+/**
+ * 육친 분석 결과
+ */
+export interface YukchinAnalysis {
+  /** 부모운 */
+  parents: {
+    luck: YukchinLuck
+    sipseong: Sipseong[]
+    count: number
+    description: string
+    recommendations: string[]
+  }
+  /** 형제자매운 */
+  siblings: {
+    luck: YukchinLuck
+    sipseong: Sipseong[]
+    count: number
+    description: string
+    recommendations: string[]
+  }
+  /** 자녀운 */
+  children: {
+    luck: YukchinLuck
+    sipseong: Sipseong[]
+    count: number
+    description: string
+    recommendations: string[]
+  }
+  /** 배우자운 */
+  spouse: {
+    luck: YukchinLuck
+    sipseong: Sipseong[]
+    count: number
+    description: string
+    recommendations: string[]
+  }
+  /** 재물운 */
+  wealth: {
+    luck: YukchinLuck
+    sipseong: Sipseong[]
+    count: number
+    description: string
+    recommendations: string[]
+  }
+  /** 종합 평가 */
+  overall: {
+    strongAreas: string[]
+    weakAreas: string[]
+    namingGuide: string
+  }
+}
