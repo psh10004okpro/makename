@@ -178,7 +178,12 @@ export class ABTester {
     request: NamingRequest
   ): NamingResponse {
     // 버전에 따라 약간 다른 품질의 응답 생성
-    const isV2 = version.version === '2.0'
+    const v = version.version
+    const isV2 = v === '2.0'
+    const isV3 = v === '3.0'
+
+    // v3.0 > v2.0 > v1.0 순으로 품질 향상
+    const qualityMultiplier = isV3 ? 1.5 : isV2 ? 1.0 : 0.5
 
     const suggestions = Array.from({ length: 20 }, (_, i) => ({
       name: `이름${i + 1}`,
@@ -191,32 +196,42 @@ export class ABTester {
         },
       ],
       pronunciation: `이름${i + 1} (Name${i + 1})`,
-      meaning: isV2
-        ? `${request.preferences?.meaningKeywords?.join(', ') || '좋은'} 의미를 담은 이름${i + 1}입니다.`
-        : `좋은 의미를 담은 이름${i + 1}입니다.`,
-      phonetics: isV2
-        ? '부드러운 모음으로 발음이 편안하고 현대적입니다. 받침이 적어 발음하기 쉽습니다.'
-        : '발음이 좋습니다.',
+      meaning: isV3
+        ? `${request.preferences?.meaningKeywords?.join(', ') || '좋은'} 의미를 모두 담은 이름${i + 1}입니다. 상서롭고 아름다운 뜻을 지녔습니다.`
+        : isV2
+          ? `${request.preferences?.meaningKeywords?.join(', ') || '좋은'} 의미를 담은 이름${i + 1}입니다.`
+          : `좋은 의미를 담은 이름${i + 1}입니다.`,
+      phonetics: isV3
+        ? '받침이 없는 부드러운 발음. ㅓ, ㅜ 등 밝은 모음의 조화로 듣기 편안하며 외국인도 쉽게 발음할 수 있습니다. 2음절로 간결하면서도 우아한 느낌을 줍니다.'
+        : isV2
+          ? '부드러운 모음으로 발음이 편안하고 현대적입니다. 받침이 적어 발음하기 쉽습니다.'
+          : '발음이 좋습니다.',
       compatibility: {
-        saju: 80 + (isV2 ? i : i / 2),
-        ohang: 85 + (isV2 ? i : i / 2),
-        strokes: 75 + (isV2 ? i : i / 2),
-        phonetics: 90 + (isV2 ? i : i / 2),
-        total: 82 + (isV2 ? i : i / 2),
+        saju: Math.min(100, 80 + (qualityMultiplier * i)),
+        ohang: Math.min(100, 85 + (qualityMultiplier * i)),
+        strokes: Math.min(100, 75 + (qualityMultiplier * i)),
+        phonetics: Math.min(100, 90 + (qualityMultiplier * i)),
+        total: Math.min(100, 82 + (qualityMultiplier * i)),
       },
-      reasoning: isV2
-        ? `이 이름은 사주의 ${request.sajuAnalysis?.yongsin?.join(', ') || '용신'} 오행을 보완하며, ` +
-          `${request.preferences?.meaningKeywords?.[0] || '좋은 의미'}를 담고 있어 추천드립니다. ` +
-          `발음이 부드럽고 현대적이며, 한자의 획수도 길합니다.`
-        : `좋은 이름입니다. 의미가 좋습니다.`,
+      reasoning: isV3
+        ? `이 이름은 용신 오행인 ${request.sajuAnalysis?.yongsin?.join(', ') || '목, 수'}를 완벽하게 반영한 이름입니다. ` +
+          `첫 번째 글자는 ${request.sajuAnalysis?.yongsin?.[0] || '목'} 오행으로 사주의 부족한 기운을 보충하며, ` +
+          `두 번째 글자는 조화를 이루는 오행입니다. 획수는 인격 대길, 지격 대길, 총격 대길로 모두 길수입니다. ` +
+          `발음이 매우 부드럽고 현대적이며 흔하지 않아 독창성도 뛰어납니다. ` +
+          `사용자가 요청한 '${request.preferences?.meaningKeywords?.[0] || '좋은 의미'}'의 의미를 모두 담고 있습니다.`
+        : isV2
+          ? `이 이름은 사주의 ${request.sajuAnalysis?.yongsin?.join(', ') || '용신'} 오행을 보완하며, ` +
+            `${request.preferences?.meaningKeywords?.[0] || '좋은 의미'}를 담고 있어 추천드립니다. ` +
+            `발음이 부드럽고 현대적이며, 한자의 획수도 길합니다.`
+          : `좋은 이름입니다. 의미가 좋습니다.`,
     }))
 
     return {
       suggestions,
       tokensUsed: {
-        input: isV2 ? 2800 : 2500,
-        output: isV2 ? 3500 : 2800,
-        total: isV2 ? 6300 : 5300,
+        input: isV3 ? 3200 : isV2 ? 2800 : 2500,
+        output: isV3 ? 4200 : isV2 ? 3500 : 2800,
+        total: isV3 ? 7400 : isV2 ? 6300 : 5300,
       },
       duration: Math.random() * 5000 + 3000,
       requestId: this.generateTestId(),

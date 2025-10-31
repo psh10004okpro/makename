@@ -133,15 +133,15 @@ async function runQualityTests() {
   printQualityReport(report)
 
   // ============================================================================
-  // 테스트 3: A/B 테스트 실행
+  // 테스트 3: A/B 테스트 실행 (3가지 버전 비교)
   // ============================================================================
-  console.log('\n📝 테스트 3: A/B 테스트 (버전 1.0 vs 2.0)\n')
+  console.log('\n📝 테스트 3: A/B 테스트 (버전 1.0 vs 2.0 vs 3.0)\n')
   console.log('-'.repeat(60))
 
   console.log('A/B 테스트를 실행합니다 (시뮬레이션)...\n')
 
   const abResult = await abTester.runTest(request, {
-    versions: ['1.0', '2.0'],
+    versions: ['1.0', '2.0', '3.0'],
   })
 
   printABTestResult(abResult)

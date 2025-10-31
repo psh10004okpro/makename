@@ -63,6 +63,7 @@ export {
   type PromptVersion,
   PROMPT_V1,
   PROMPT_V2,
+  PROMPT_V3,
   PROMPT_VERSIONS,
   getActivePrompt,
   getPromptVersion,
