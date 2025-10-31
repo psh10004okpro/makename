@@ -253,6 +253,99 @@ export interface SipseongAnalysis {
 }
 
 // ============================================================================
+// 대운 (大運) - Major Cycles
+// ============================================================================
+
+/**
+ * 대운 (大運)
+ * 10년 단위로 변하는 운세
+ */
+export interface Daeun {
+  /** 천간 */
+  cheongan: Cheongan
+  /** 지지 */
+  jiji: Jiji
+  /** 대운 이름 (예: "갑자") */
+  name: string
+  /** 한자 표기 (예: "甲子") */
+  hanja: string
+  /** 시작 나이 */
+  startAge: number
+  /** 종료 나이 */
+  endAge: number
+  /** 대운 오행 */
+  ohang: {
+    cheongan: Ohang
+    jiji: Ohang
+  }
+  /** 대운 십성 */
+  sipseong: {
+    cheongan: Sipseong
+    jiji: Sipseong
+  }
+}
+
+/**
+ * 대운 방향
+ */
+export type DaeunDirection = '순행' | '역행'
+
+/**
+ * 대운 분석 결과
+ */
+export interface DaeunAnalysis {
+  /** 대운 방향 (순행/역행) */
+  direction: DaeunDirection
+  /** 입운 연령 */
+  startAge: number
+  /** 대운 목록 (보통 10개, 100세까지) */
+  cycles: Daeun[]
+  /** 현재 대운 (나이 기준) */
+  currentCycle?: Daeun
+  /** 다음 대운 */
+  nextCycle?: Daeun
+  /** 현재 대운의 특성 */
+  currentCharacteristics?: {
+    /** 운세 흐름 */
+    flow: string
+    /** 강점 */
+    strengths: string[]
+    /** 주의사항 */
+    warnings: string[]
+    /** 적합한 활동 */
+    suitableActivities: string[]
+  }
+  /** 대운 설명 */
+  description: string
+}
+
+/**
+ * 대운과 사주의 관계
+ */
+export type DaeunRelation = '충' | '합' | '형' | '파' | '해' | '원진' | '중립'
+
+/**
+ * 대운 상호작용 분석
+ */
+export interface DaeunInteraction {
+  /** 대운 기둥 */
+  daeun: Daeun
+  /** 사주와의 관계 */
+  relations: {
+    withYear: DaeunRelation
+    withMonth: DaeunRelation
+    withDay: DaeunRelation
+    withHour: DaeunRelation
+  }
+  /** 긍정 요소 */
+  positive: string[]
+  /** 부정 요소 */
+  negative: string[]
+  /** 종합 평가 */
+  overallRating: '매우 좋음' | '좋음' | '보통' | '주의' | '매우 주의'
+}
+
+// ============================================================================
 // 사주 기둥 (四柱) - Four Pillars
 // ============================================================================
 

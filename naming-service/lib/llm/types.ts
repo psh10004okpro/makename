@@ -55,6 +55,43 @@ export interface SipseongInfo {
 }
 
 /**
+ * 대운 정보 (LLM 전달용)
+ */
+export interface DaeunInfo {
+  /** 대운 방향 */
+  direction: string
+  /** 입운 연령 */
+  startAge: number
+  /** 현재 대운 */
+  currentCycle?: {
+    /** 대운 간지 */
+    name: string
+    /** 대운 한자 */
+    hanja: string
+    /** 시작-종료 나이 */
+    ageRange: string
+    /** 대운 십성 */
+    sipseong: string
+    /** 운세 흐름 */
+    flow: string
+    /** 강점 */
+    strengths: string[]
+    /** 주의사항 */
+    warnings: string[]
+    /** 적합한 활동 */
+    suitableActivities: string[]
+  }
+  /** 다음 대운 */
+  nextCycle?: {
+    name: string
+    hanja: string
+    ageRange: string
+  }
+  /** 전체 대운 요약 */
+  summary: string
+}
+
+/**
  * 사주 분석 요약 (LLM 전달용)
  */
 export interface SajuAnalysisSummary {
@@ -80,6 +117,8 @@ export interface SajuAnalysisSummary {
   seasonalInfo?: SeasonalInfo
   /** 십성 분석 정보 (선택사항) */
   sipseongInfo?: SipseongInfo
+  /** 대운 분석 정보 (선택사항) */
+  daeunInfo?: DaeunInfo
 }
 
 /**

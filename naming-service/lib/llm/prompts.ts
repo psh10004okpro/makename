@@ -230,6 +230,55 @@ export function createUserPrompt(context: PromptContext): string {
       parts.push('💡 **십성 작명 원칙**: 십성 분석을 통해 파악된 성격과 재능을 고려하여, 부족한 부분을 보완하고 강점을 살리는 이름을 지어주세요.')
     }
 
+    // 대운 분석 정보 (추가)
+    if (saju.daeunInfo) {
+      parts.push('')
+      parts.push('### 🔮 대운 (大運) 분석')
+      parts.push('')
+      parts.push(`**대운 흐름**: ${saju.daeunInfo.direction}, ${saju.daeunInfo.startAge}세 입운`)
+      parts.push(`**전체 요약**: ${saju.daeunInfo.summary}`)
+      parts.push('')
+
+      if (saju.daeunInfo.currentCycle) {
+        const current = saju.daeunInfo.currentCycle
+        parts.push('**현재 대운** (현재 진행 중):')
+        parts.push(`  ${current.hanja}(${current.name}) 대운 - ${current.ageRange}`)
+        parts.push(`  십성: ${current.sipseong}`)
+        parts.push(`  ${current.flow}`)
+        parts.push('')
+
+        if (current.strengths.length > 0) {
+          parts.push('  **이 시기의 강점**:')
+          current.strengths.forEach((s, i) => {
+            parts.push(`    ${i + 1}. ${s}`)
+          })
+          parts.push('')
+        }
+
+        if (current.warnings.length > 0) {
+          parts.push('  **주의사항**:')
+          current.warnings.forEach((w, i) => {
+            parts.push(`    ${i + 1}. ${w}`)
+          })
+          parts.push('')
+        }
+
+        if (current.suitableActivities.length > 0) {
+          parts.push('  **적합한 활동**:')
+          parts.push(`    ${current.suitableActivities.join(', ')}`)
+          parts.push('')
+        }
+      }
+
+      if (saju.daeunInfo.nextCycle) {
+        const next = saju.daeunInfo.nextCycle
+        parts.push(`**다음 대운**: ${next.hanja}(${next.name}) ${next.ageRange}`)
+        parts.push('')
+      }
+
+      parts.push('💡 **대운 작명 원칙**: 현재와 미래 대운을 고려하여, 앞으로의 운세 흐름에 도움이 되는 이름을 지어주세요.')
+    }
+
     parts.push('')
     parts.push('💡 **작명 지침**: 사주의 약한 오행(특히 결여된 오행)을 보완하고, 용신 오행을 가진 한자를 우선적으로 사용하세요. 강한 오행과 기신 오행은 피하세요.')
     parts.push('')
