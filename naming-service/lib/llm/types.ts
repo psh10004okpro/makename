@@ -92,6 +92,38 @@ export interface DaeunInfo {
 }
 
 /**
+ * 격국 정보 (LLM 전달용)
+ */
+export interface GyeokgukInfo {
+  /** 격국 이름 */
+  gyeokguk: string
+  /** 격국 분류 (정격/외격/기타) */
+  category: '정격' | '외격' | '기타'
+  /** 격국 강도 */
+  strength: string
+  /** 용신 (필요한 십성) */
+  yongsin: string[]
+  /** 희신 (도움되는 십성) */
+  heesin: string[]
+  /** 기신 (해로운 십성) */
+  gisin: string[]
+  /** 격국 설명 */
+  description: string
+  /** 성격 특성 */
+  characteristics: string[]
+  /** 직업 적성 */
+  careerSuitability: string[]
+  /** 재물운 */
+  wealthLuck: string
+  /** 명예운 */
+  fameLuck: string
+  /** 학업운 */
+  academicLuck: string
+  /** 주의사항 */
+  warnings: string[]
+}
+
+/**
  * 사주 분석 요약 (LLM 전달용)
  */
 export interface SajuAnalysisSummary {
@@ -119,6 +151,8 @@ export interface SajuAnalysisSummary {
   sipseongInfo?: SipseongInfo
   /** 대운 분석 정보 (선택사항) */
   daeunInfo?: DaeunInfo
+  /** 격국 분석 정보 (선택사항) */
+  gyeokgukInfo?: GyeokgukInfo
 }
 
 /**

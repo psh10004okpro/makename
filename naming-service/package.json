@@ -18,7 +18,8 @@
     "test:methods": "tsx lib/llm/test-methods.ts",
     "test:johoo": "tsx lib/saju/test-johoo.ts",
     "test:sipseong": "tsx lib/saju/test-sipseong.ts",
-    "test:daeun": "tsx lib/saju/test-daeun.ts"
+    "test:daeun": "tsx lib/saju/test-daeun.ts",
+    "test:gyeokguk": "tsx lib/saju/test-gyeokguk.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

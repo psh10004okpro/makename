@@ -279,6 +279,58 @@ export function createUserPrompt(context: PromptContext): string {
       parts.push('💡 **대운 작명 원칙**: 현재와 미래 대운을 고려하여, 앞으로의 운세 흐름에 도움이 되는 이름을 지어주세요.')
     }
 
+    // 격국 분석 정보 (추가)
+    if (saju.gyeokgukInfo) {
+      parts.push('')
+      parts.push('### 🏛️ 격국 (格局) 분석')
+      parts.push('')
+      parts.push(`**격국**: ${saju.gyeokgukInfo.gyeokguk} (${saju.gyeokgukInfo.category})`)
+      parts.push(`**격국 강도**: ${saju.gyeokgukInfo.strength}`)
+      parts.push(`**설명**: ${saju.gyeokgukInfo.description}`)
+      parts.push('')
+
+      if (saju.gyeokgukInfo.yongsin.length > 0) {
+        parts.push(`**용신 (필요한 십성)**: ${saju.gyeokgukInfo.yongsin.join(', ')} ← 가장 필요`)
+      }
+      if (saju.gyeokgukInfo.heesin.length > 0) {
+        parts.push(`**희신 (도움되는 십성)**: ${saju.gyeokgukInfo.heesin.join(', ')} ← 보조적 도움`)
+      }
+      if (saju.gyeokgukInfo.gisin.length > 0) {
+        parts.push(`**기신 (해로운 십성)**: ${saju.gyeokgukInfo.gisin.join(', ')} ⚠️ 피할 것`)
+      }
+      parts.push('')
+
+      if (saju.gyeokgukInfo.characteristics.length > 0) {
+        parts.push('**성격 특성**:')
+        saju.gyeokgukInfo.characteristics.forEach((char, i) => {
+          parts.push(`  ${i + 1}. ${char}`)
+        })
+        parts.push('')
+      }
+
+      if (saju.gyeokgukInfo.careerSuitability.length > 0) {
+        parts.push('**직업 적성**:')
+        parts.push(`  ${saju.gyeokgukInfo.careerSuitability.join(', ')}`)
+        parts.push('')
+      }
+
+      parts.push('**운세 평가**:')
+      parts.push(`  재물운: ${saju.gyeokgukInfo.wealthLuck}`)
+      parts.push(`  명예운: ${saju.gyeokgukInfo.fameLuck}`)
+      parts.push(`  학업운: ${saju.gyeokgukInfo.academicLuck}`)
+      parts.push('')
+
+      if (saju.gyeokgukInfo.warnings.length > 0) {
+        parts.push('**주의사항**:')
+        saju.gyeokgukInfo.warnings.forEach((warning, i) => {
+          parts.push(`  ${i + 1}. ${warning}`)
+        })
+        parts.push('')
+      }
+
+      parts.push('💡 **격국 작명 원칙**: 격국의 용신/희신에 해당하는 십성의 의미를 담은 한자를 사용하고, 기신 십성은 피하여 명식의 균형을 맞추세요.')
+    }
+
     parts.push('')
     parts.push('💡 **작명 지침**: 사주의 약한 오행(특히 결여된 오행)을 보완하고, 용신 오행을 가진 한자를 우선적으로 사용하세요. 강한 오행과 기신 오행은 피하세요.')
     parts.push('')
