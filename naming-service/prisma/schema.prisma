@@ -99,3 +99,27 @@ enum RequestStatus {
   COMPLETED  // 완료
   FAILED     // 실패
 }
+
+// 한자 모델
+// 작명에 사용되는 한자 데이터베이스
+model Hanja {
+  id        String   @id @default(cuid())
+  character String   @unique // 한자 문자 (예: "智", "優")
+  korean    String   // 한글 음 (예: "지", "우")
+  meaning   String   // 의미 (예: "지혜, 슬기")
+  strokes   Int      // 획수 (예: 12획)
+  radical   String?  // 부수 (예: "日部")
+  ohang     String   // 오행 (목/화/토/금/수)
+  gender    String[] // 적합한 성별 배열 (MALE, FEMALE, NEUTRAL)
+  frequency Int      @default(0) // 사용 빈도 (높을수록 자주 사용됨)
+  positive  Boolean  @default(true) // 긍정적 의미 여부
+  tags      String[] // 태그 배열 (예: ["지혜", "총명", "학문"])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([korean]) // 한글 음으로 검색 최적화
+  @@index([ohang])  // 오행으로 검색 최적화
+  @@index([strokes]) // 획수로 검색 최적화
+  @@index([positive]) // 긍정적 의미로 필터링
+  @@map("hanja")
+}
