@@ -222,9 +222,9 @@ export function SajuAnalysisResult({
       {showSipseong && (
         <SipseongAnalysis
           count={data.sipseong.count}
-          strong={data.sipseong.strong}
-          weak={data.sipseong.weak}
-          missing={data.sipseong.missing}
+          strong={data.sipseong.strong as any}
+          weak={data.sipseong.weak as any}
+          missing={data.sipseong.missing as any}
           personality={data.sipseong.personality}
           talents={data.sipseong.talents}
           warnings={data.sipseong.warnings}

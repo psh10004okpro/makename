@@ -119,7 +119,7 @@ export class HanjaAnalyzer {
       })
 
       // Prisma 결과를 HanjaData 형식으로 변환
-      return results.map(r => ({
+      return results.map((r: any) => ({
         character: r.character,
         korean: r.korean,
         meaning: r.meaning,
@@ -142,7 +142,7 @@ export class HanjaAnalyzer {
    * @param strokes 획수
    * @returns 81수리 정보 및 점수
    */
-  calculateStrokeLuck(strokes: number): { info: StrokeInfo; score: number } {
+  calculateStrokeLuck(strokes: number): { strokes: number; info: StrokeInfo; score: number } {
     const info = getStrokeInfo(strokes)
 
     // 길흉에 따른 점수 부여
@@ -170,7 +170,7 @@ export class HanjaAnalyzer {
         score = 50
     }
 
-    return { info, score }
+    return { strokes, info, score }
   }
 
   /**
@@ -243,7 +243,7 @@ export class HanjaAnalyzer {
       chonggyeok,
       averageScore,
       grade,
-    })
+    } as any)
 
     return {
       cheongyeok: {
@@ -519,7 +519,6 @@ export class HanjaAnalyzer {
       '염': [7],
       '여': [8],
       '추': [11],
-      '노': [19],
       '도': [10],
       '소': [10],
       '석': [5],

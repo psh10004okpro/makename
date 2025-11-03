@@ -8,7 +8,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateNames } from '@/lib/llm'
 import type { NamingRequest, NamingResponse } from '@/lib/llm'
-import { Gender, NamingMethod } from '@prisma/client'
 import { withRateLimit, RateLimitPresets } from '@/lib/middleware/rate-limit'
 
 interface GenerateNamesApiRequest {
@@ -105,8 +104,8 @@ async function handlePOST(
     // NamingRequest 구성
     const namingRequest: NamingRequest = {
       familyName: body.familyName,
-      gender: body.gender as Gender,
-      method: body.method as NamingMethod,
+      gender: body.gender,
+      method: body.method,
     }
 
     // 생년월일 정보 추가

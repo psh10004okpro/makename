@@ -21,11 +21,11 @@ const babyInfoSchema = z.object({
     .regex(/^[가-힣]+$/, '한글만 입력 가능합니다'),
 
   gender: z.enum(['MALE', 'FEMALE', 'NEUTRAL'], {
-    required_error: '성별을 선택해주세요',
+    message: '성별을 선택해주세요',
   }),
 
   birthDate: z.date({
-    required_error: '생년월일을 선택해주세요',
+    message: '생년월일을 선택해주세요',
   }),
 
   birthTime: z.string().nullable(),

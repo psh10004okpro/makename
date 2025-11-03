@@ -4,10 +4,11 @@
 
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { ResultPageClient } from '@/components/naming/ResultPageClient'
 
 interface ResultPageProps {
   params: {
@@ -23,7 +24,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
   }
 
   // 요청 조회
-  const request = await db.namingRequest.findUnique({
+  const request = await prisma.namingRequest.findUnique({
     where: {
       id: params.id,
     },
@@ -110,158 +111,15 @@ export default async function ResultPage({ params }: ResultPageProps) {
         </p>
       </div>
 
-      {/* 사주 분석 정보 (전통/종합 방식인 경우) */}
-      {sajuAnalysis && (
-        <Card className="p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4">📜 사주팔자 분석</h2>
-          <div className="grid md:grid-cols-4 gap-4 mb-4">
-            <div>
-              <div className="text-sm text-gray-500">년주</div>
-              <div className="font-bold text-lg">{sajuAnalysis.saju?.year}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">월주</div>
-              <div className="font-bold text-lg">{sajuAnalysis.saju?.month}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">일주</div>
-              <div className="font-bold text-lg">{sajuAnalysis.saju?.day}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500">시주</div>
-              <div className="font-bold text-lg">{sajuAnalysis.saju?.hour}</div>
-            </div>
-          </div>
-
-          {sajuAnalysis.ohang && (
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h3 className="font-bold mb-2">오행 분석</h3>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                {sajuAnalysis.ohang.yongsin && (
-                  <div>
-                    <span className="text-gray-600">용신:</span>{' '}
-                    <span className="font-medium">{sajuAnalysis.ohang.yongsin.join(', ')}</span>
-                  </div>
-                )}
-                {sajuAnalysis.ohang.weakElements && sajuAnalysis.ohang.weakElements.length > 0 && (
-                  <div>
-                    <span className="text-gray-600">약한 오행:</span>{' '}
-                    <span className="font-medium">{sajuAnalysis.ohang.weakElements.join(', ')}</span>
-                  </div>
-                )}
-                {sajuAnalysis.ohang.strongElements && sajuAnalysis.ohang.strongElements.length > 0 && (
-                  <div>
-                    <span className="text-gray-600">강한 오행:</span>{' '}
-                    <span className="font-medium">{sajuAnalysis.ohang.strongElements.join(', ')}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </Card>
-      )}
-
-      {/* 이름 추천 목록 */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">✨ 추천 이름 ({suggestions.length}개)</h2>
-
-        {suggestions.map((suggestion, index) => (
-          <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-3xl font-bold mb-2">
-                  {request.familyName}
-                  {suggestion.givenName}
-                </h3>
-                {suggestion.hanja && (
-                  <p className="text-xl text-gray-600">
-                    {request.familyName} {suggestion.hanja}
-                  </p>
-                )}
-              </div>
-              {suggestion.compatibility && (
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-500">
-                    {suggestion.compatibility.overall}점
-                  </div>
-                  <div className="text-sm text-gray-500">종합 점수</div>
-                </div>
-              )}
-            </div>
-
-            {/* 의미 */}
-            {suggestion.meaning && (
-              <div className="mb-4">
-                <h4 className="font-bold text-sm text-gray-500 mb-1">의미</h4>
-                <p className="text-gray-700">{suggestion.meaning}</p>
-              </div>
-            )}
-
-            {/* 한자별 설명 */}
-            {suggestion.hanjaDetails && suggestion.hanjaDetails.length > 0 && (
-              <div className="mb-4">
-                <h4 className="font-bold text-sm text-gray-500 mb-2">한자 상세</h4>
-                <div className="grid md:grid-cols-2 gap-3">
-                  {suggestion.hanjaDetails.map((detail: any, idx: number) => (
-                    <div key={idx} className="bg-gray-50 p-3 rounded">
-                      <div className="font-bold text-lg mb-1">
-                        {detail.character} ({detail.meaning})
-                      </div>
-                      {detail.reading && (
-                        <div className="text-sm text-gray-600">
-                          음: {detail.reading}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 궁합 점수 상세 */}
-            {suggestion.compatibility && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                {suggestion.compatibility.saju !== undefined && (
-                  <div>
-                    <div className="text-gray-500">사주 궁합</div>
-                    <div className="font-bold">{suggestion.compatibility.saju}점</div>
-                  </div>
-                )}
-                {suggestion.compatibility.phonetics !== undefined && (
-                  <div>
-                    <div className="text-gray-500">발음</div>
-                    <div className="font-bold">{suggestion.compatibility.phonetics}점</div>
-                  </div>
-                )}
-                {suggestion.compatibility.meaning !== undefined && (
-                  <div>
-                    <div className="text-gray-500">의미</div>
-                    <div className="font-bold">{suggestion.compatibility.meaning}점</div>
-                  </div>
-                )}
-                {suggestion.compatibility.strokes !== undefined && (
-                  <div>
-                    <div className="text-gray-500">획수</div>
-                    <div className="font-bold">{suggestion.compatibility.strokes}점</div>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
-
-      {/* 액션 버튼 */}
-      <div className="mt-8 flex gap-4 justify-center">
-        <Link href="/baby">
-          <Button variant="outline" size="lg">
-            다시 작명하기
-          </Button>
-        </Link>
-        <Button size="lg" onClick={() => window.print()}>
-          결과 인쇄
-        </Button>
-      </div>
+      {/* 클라이언트 컴포넌트로 전체 결과 UI 렌더링 */}
+      <ResultPageClient
+        requestId={request.id}
+        familyName={request.familyName}
+        gender={request.gender}
+        method={request.method}
+        suggestions={suggestions}
+        sajuAnalysis={sajuAnalysis}
+      />
     </div>
   )
 }

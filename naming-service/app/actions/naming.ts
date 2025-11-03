@@ -5,15 +5,14 @@
  */
 
 import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { calculateSaju } from '@/lib/saju/calculator'
-import { analyzeOhang } from '@/lib/saju/ohang'
+import { analyzeOhangBalance } from '@/lib/saju/ohang'
 import { analyzeSipseong } from '@/lib/saju/sipseong'
 import { analyzeDaeun } from '@/lib/saju/daeun'
 import { analyzeGyeokguk } from '@/lib/saju/gyeokguk'
-import { getSeasonalYongsin } from '@/lib/saju/johoo'
+import { getSeasonInfo } from '@/lib/saju/johoo'
 import { generateNames } from '@/lib/llm'
-import { NamingRequest } from '@prisma/client'
 
 export interface BabyNamingInput {
   familyName: string
@@ -45,7 +44,7 @@ export async function generateBabyNames(
     }
 
     // 2. DB에 요청 저장
-    const request = await db.namingRequest.create({
+    const request = await prisma.namingRequest.create({
       data: {
         userId: session.user.id,
         type: 'BABY',
@@ -77,7 +76,7 @@ export async function generateBabyNames(
  */
 async function processNamingRequest(requestId: string) {
   try {
-    const request = await db.namingRequest.findUnique({
+    const request = await prisma.namingRequest.findUnique({
       where: { id: requestId },
     })
 
@@ -98,10 +97,11 @@ async function processNamingRequest(requestId: string) {
       })
 
       // 오행 분석
-      const ohangAnalysis = analyzeOhang(saju)
+      const ohangAnalysis = analyzeOhangBalance(saju)
 
       // 계절 조후 분석
-      const seasonalInfo = getSeasonalYongsin(request.birthDate, request.isLunar || false)
+      const birthMonth = request.birthDate.getMonth() + 1 // 1-12
+      const seasonalInfo = getSeasonInfo(birthMonth)
 
       // 십성 분석
       const sipseongAnalysis = analyzeSipseong(saju)
@@ -122,9 +122,9 @@ async function processNamingRequest(requestId: string) {
         },
         ohang: {
           count: ohangAnalysis.count,
-          weakElements: ohangAnalysis.weakElements,
-          strongElements: ohangAnalysis.strongElements,
-          missingElements: ohangAnalysis.missingElements,
+          weakElements: ohangAnalysis.weak,
+          strongElements: ohangAnalysis.strong,
+          missingElements: ohangAnalysis.missing,
           yongsin: ohangAnalysis.yongsin,
           gisin: ohangAnalysis.gisin,
         },
@@ -186,7 +186,7 @@ async function processNamingRequest(requestId: string) {
     console.log('✅ AI 작명 완료:', namingResponse.suggestions.length, '개')
 
     // 6. 결과 저장
-    await db.namingResult.create({
+    await prisma.namingResult.create({
       data: {
         requestId: request.id,
         suggestions: namingResponse.suggestions as any,
@@ -199,7 +199,7 @@ async function processNamingRequest(requestId: string) {
     })
 
     // 7. 요청 상태 업데이트
-    await db.namingRequest.update({
+    await prisma.namingRequest.update({
       where: { id: requestId },
       data: { status: 'COMPLETED' },
     })
@@ -209,12 +209,12 @@ async function processNamingRequest(requestId: string) {
     console.error('❌ 작명 처리 오류:', error)
 
     // 에러 처리
-    await db.namingRequest.update({
+    await prisma.namingRequest.update({
       where: { id: requestId },
       data: {
         status: 'FAILED',
         preferences: {
-          ...(await db.namingRequest.findUnique({ where: { id: requestId } }))?.preferences,
+          ...(await prisma.namingRequest.findUnique({ where: { id: requestId } }))?.preferences,
           error: error.message,
         } as any,
       },
@@ -229,7 +229,7 @@ async function processNamingRequest(requestId: string) {
  */
 export async function getNamingRequestStatus(requestId: string) {
   try {
-    const request = await db.namingRequest.findUnique({
+    const request = await prisma.namingRequest.findUnique({
       where: { id: requestId },
       include: {
         results: {

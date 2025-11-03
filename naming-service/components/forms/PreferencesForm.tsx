@@ -205,11 +205,11 @@ export function PreferencesForm({ onNext, onPrev }: PreferencesFormProps) {
             선호하는 글자 수 <span className="text-gray-400">(선택)</span>
           </label>
           <div className="grid grid-cols-3 gap-3">
-            {[
+            {([
               { value: null, label: '상관없음' },
               { value: 2, label: '2자 (예: 민수)' },
               { value: 3, label: '3자 (예: 지민수)' },
-            ].map((option) => (
+            ] as const).map((option) => (
               <label
                 key={option.label}
                 className={`

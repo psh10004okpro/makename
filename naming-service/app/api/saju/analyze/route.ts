@@ -7,11 +7,11 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { calculateSaju } from '@/lib/saju/calculator'
-import { analyzeOhang } from '@/lib/saju/ohang'
+import { analyzeOhangBalance } from '@/lib/saju/ohang'
 import { analyzeSipseong } from '@/lib/saju/sipseong'
 import { analyzeDaeun } from '@/lib/saju/daeun'
 import { analyzeGyeokguk } from '@/lib/saju/gyeokguk'
-import { getSeasonalYongsin } from '@/lib/saju/johoo'
+import { getSeasonInfo } from '@/lib/saju/johoo'
 import { getCache, CacheKeys, CacheTTL } from '@/lib/cache'
 import { withRateLimit, RateLimitPresets } from '@/lib/middleware/rate-limit'
 
@@ -121,10 +121,11 @@ async function handlePOST(request: NextRequest): Promise<NextResponse<AnalyzeSaj
     })
 
     // 2. 오행 분석
-    const ohangAnalysis = analyzeOhang(saju)
+    const ohangAnalysis = analyzeOhangBalance(saju)
 
     // 3. 계절 조후 용신 분석
-    const seasonalInfo = getSeasonalYongsin(birthDate, body.isLunar || false)
+    const birthMonth = birthDate.getMonth() + 1 // 1-12
+    const seasonalInfo = getSeasonInfo(birthMonth)
 
     // 4. 십성 분석
     const sipseongAnalysis = analyzeSipseong(saju)
@@ -149,9 +150,9 @@ async function handlePOST(request: NextRequest): Promise<NextResponse<AnalyzeSaj
       },
       ohang: {
         count: ohangAnalysis.count,
-        weakElements: ohangAnalysis.weakElements,
-        strongElements: ohangAnalysis.strongElements,
-        missingElements: ohangAnalysis.missingElements,
+        weakElements: ohangAnalysis.weak,
+        strongElements: ohangAnalysis.strong,
+        missingElements: ohangAnalysis.missing,
         yongsin: ohangAnalysis.yongsin,
         gisin: ohangAnalysis.gisin,
         seasonalInfo: seasonalInfo

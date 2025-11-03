@@ -7,14 +7,13 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { calculateSaju } from '@/lib/saju/calculator'
-import { analyzeOhang } from '@/lib/saju/ohang'
+import { analyzeOhangBalance } from '@/lib/saju/ohang'
 import { analyzeSipseong } from '@/lib/saju/sipseong'
 import { analyzeDaeun } from '@/lib/saju/daeun'
 import { analyzeGyeokguk } from '@/lib/saju/gyeokguk'
-import { getSeasonalYongsin } from '@/lib/saju/johoo'
+import { getSeasonInfo } from '@/lib/saju/johoo'
 import { generateNames } from '@/lib/llm'
 import type { NamingRequest, NamingResponse } from '@/lib/llm'
-import { Gender, NamingMethod } from '@prisma/client'
 import { withRateLimit, RateLimitPresets } from '@/lib/middleware/rate-limit'
 
 interface AnalyzeAndGenerateRequest {
@@ -136,10 +135,11 @@ async function handlePOST(
     })
 
     // 2. 오행 분석
-    const ohangAnalysis = analyzeOhang(saju)
+    const ohangAnalysis = analyzeOhangBalance(saju)
 
     // 3. 계절 조후 용신 분석
-    const seasonalInfo = getSeasonalYongsin(birthDate, body.isLunar || false)
+    const birthMonth = birthDate.getMonth() + 1 // 1-12
+    const seasonalInfo = getSeasonInfo(birthMonth)
 
     // 4. 십성 분석
     const sipseongAnalysis = analyzeSipseong(saju)
@@ -164,9 +164,9 @@ async function handlePOST(
 
     const ohangData = {
       count: ohangAnalysis.count,
-      weakElements: ohangAnalysis.weakElements,
-      strongElements: ohangAnalysis.strongElements,
-      missingElements: ohangAnalysis.missingElements,
+      weakElements: ohangAnalysis.weak,
+      strongElements: ohangAnalysis.strong,
+      missingElements: ohangAnalysis.missing,
       yongsin: ohangAnalysis.yongsin,
       gisin: ohangAnalysis.gisin,
       seasonalInfo: seasonalInfo
@@ -226,9 +226,9 @@ async function handlePOST(
       month: `${saju.month.hanja}(${saju.month.name})`,
       day: `${saju.day.hanja}(${saju.day.name})`,
       hour: `${saju.hour.hanja}(${saju.hour.name})`,
-      weakElements: ohangAnalysis.weakElements,
-      strongElements: ohangAnalysis.strongElements,
-      missingElements: ohangAnalysis.missingElements,
+      weakElements: ohangAnalysis.weak,
+      strongElements: ohangAnalysis.strong,
+      missingElements: ohangAnalysis.missing,
       yongsin: ohangAnalysis.yongsin,
       gisin: ohangAnalysis.gisin,
       seasonalInfo: seasonalInfo
@@ -240,8 +240,6 @@ async function handlePOST(
             avoidedElements: seasonalInfo.avoidedElements,
             description: seasonalInfo.description,
             characteristics: seasonalInfo.characteristics,
-            adjustmentReason: seasonalInfo.adjustmentReason,
-            priority: seasonalInfo.priority,
           }
         : undefined,
       sipseongInfo: {
@@ -297,11 +295,11 @@ async function handlePOST(
     // NamingRequest 구성
     const namingRequest: NamingRequest = {
       familyName: body.familyName,
-      gender: body.gender as Gender,
+      gender: body.gender,
       birthDate: birthDate,
       birthTime: body.birthTime,
       isLunar: body.isLunar || false,
-      method: body.method as NamingMethod,
+      method: body.method,
       sajuAnalysis: sajuAnalysisSummary as any,
       preferences: body.preferences,
     }

@@ -24,8 +24,6 @@ export {
   type StrokeInfo,
   type StrokeLuck,
   getStrokeInfo,
-  getStrokeLuckScore,
-  isAuspiciousStroke,
 } from './strokes'
 
 // 분석기
@@ -35,13 +33,15 @@ export {
   type CombinationScore,
 } from './analyzer'
 
+import { HanjaAnalyzer as HanjaAnalyzerClass } from './analyzer'
+
 // 시딩
 export { seedHanja } from './seed'
 
 /**
  * 간편 사용을 위한 기본 인스턴스
  */
-export const hanjaAnalyzer = new HanjaAnalyzer()
+export const hanjaAnalyzer = new HanjaAnalyzerClass()
 
 /**
  * 전체 시스템 사용 예시
